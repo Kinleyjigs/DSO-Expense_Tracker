@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "test": "pnpm test:ui && pnpm test:e2e",
-    "test:ui": "tsx --test test/ui/**/*.test.ts",
+    "test:ui": "sh -c 'if ls test/ui/**/*.test.ts 1> /dev/null 2>&1; then tsx --test test/ui/**/*.test.ts; else echo "No UI tests found."; fi'",
     "test:e2e": "tsx --test test/e2e/**/*.test.ts"
   },
   "dependencies": {

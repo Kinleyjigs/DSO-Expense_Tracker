@@ -3,6 +3,10 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Allow build-time override for the API URL
+ARG NEXT_PUBLIC_API_URL=https://expense-tracker-backend-nii9.onrender.com/api
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 # Copy package files
 COPY package.json pnpm-lock.yaml ./
 
@@ -35,6 +39,9 @@ COPY --from=builder /app/.next ./.next
 
 # Copy environment file (actual .env should be provided at runtime)
 COPY .env.example .env.local
+
+# If a build-arg was provided, ensure .env.local has the correct NEXT_PUBLIC_API_URL
+RUN if [ -n "$NEXT_PUBLIC_API_URL" ]; then echo "NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL" > .env.local; fi
 
 # Expose port
 EXPOSE 3000

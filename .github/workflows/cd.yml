@@ -12,6 +12,7 @@ concurrency:
 env:
   BACKEND_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/expense-tracker-backend
   FRONTEND_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/expense-tracker-frontend
+  NEXT_PUBLIC_API_URL: https://expense-tracker-backend-nii9.onrender.com/api
 
 jobs:
   test-backend:
@@ -111,6 +112,8 @@ jobs:
         with:
           context: ./frontend
           file: ./frontend/Dockerfile
+          build-args: |
+            NEXT_PUBLIC_API_URL=${{ env.NEXT_PUBLIC_API_URL }}
           push: true
           tags: |
             ${{ env.FRONTEND_IMAGE }}:latest
