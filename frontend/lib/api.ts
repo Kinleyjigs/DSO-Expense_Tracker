@@ -1,4 +1,6 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  "https://expense-tracker-backend-nii9.onrender.com/api";
 
 interface ApiOptions extends RequestInit {
   token?: string;

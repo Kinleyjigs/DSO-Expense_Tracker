@@ -27,12 +27,11 @@ RUN npm install -g pnpm
 # Copy package files from builder
 COPY --from=builder /app/package.json /app/pnpm-lock.yaml ./
 
-# Install production dependencies only
-RUN pnpm install --prod --frozen-lockfile
+# Install production dependencies with npm to avoid pnpm symlink issues in the runtime image
+RUN npm install --omit=dev
 
 # Copy built application
 COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
 
 # Copy environment file (actual .env should be provided at runtime)
 COPY .env.example .env.local
@@ -45,4 +44,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1
 
 # Start the application
-CMD ["pnpm", "start"]
+CMD ["npm", "run", "start"]

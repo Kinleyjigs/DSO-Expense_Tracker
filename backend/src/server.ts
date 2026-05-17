@@ -13,7 +13,9 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin:
+      process.env.FRONTEND_URL ||
+      "https://expense-tracker-frontend-pj0r.onrender.com",
     credentials: true,
   })
 );
@@ -37,10 +39,16 @@ app.get("/", (_req, res) => {
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-  console.log(`Health check: http://localhost:${PORT}/api/health`);
-});
+export function startServer(port: string | number = PORT) {
+  return app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+    console.log(`Health check: http://localhost:${port}/api/health`);
+  });
+}
+
+// Only start server if this file is run directly (not imported in tests)
+if (process.argv[1] && process.argv[1].endsWith('server.js')) {
+  startServer();
+}
 
 export default app;

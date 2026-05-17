@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { useExpenseStore } from '@/lib/store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp, TrendingDown, DollarSign, Receipt, Calendar, ArrowUpRight, ArrowDownRight } from 'lucide-react';
-import { format, startOfMonth, endOfMonth, subMonths, isWithinInterval } from 'date-fns';
+import { calculateSummaryStats } from '@/lib/dashboard-stats';
 
 interface SummaryCardProps {
   title: string;
@@ -55,53 +55,7 @@ export function SummaryCards() {
   const expenses = useExpenseStore((state) => state.expenses);
 
   const stats = useMemo(() => {
-    const now = new Date();
-    const thisMonth = {
-      start: startOfMonth(now),
-      end: endOfMonth(now),
-    };
-    const lastMonth = {
-      start: startOfMonth(subMonths(now, 1)),
-      end: endOfMonth(subMonths(now, 1)),
-    };
-
-    const thisMonthExpenses = expenses.filter((e) =>
-      isWithinInterval(new Date(e.date), thisMonth)
-    );
-    const lastMonthExpenses = expenses.filter((e) =>
-      isWithinInterval(new Date(e.date), lastMonth)
-    );
-
-    const thisMonthTotal = thisMonthExpenses.reduce((sum, e) => sum + e.amount, 0);
-    const lastMonthTotal = lastMonthExpenses.reduce((sum, e) => sum + e.amount, 0);
-
-    const monthlyChange = lastMonthTotal > 0
-      ? ((thisMonthTotal - lastMonthTotal) / lastMonthTotal) * 100
-      : null;
-
-    const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
-    const avgPerTransaction = expenses.length > 0 ? totalExpenses / expenses.length : 0;
-
-    // Daily average this month
-    const daysInMonth = now.getDate();
-    const dailyAvg = daysInMonth > 0 ? thisMonthTotal / daysInMonth : 0;
-
-    // Last month daily average for comparison
-    const daysLastMonth = new Date(lastMonth.end).getDate();
-    const lastMonthDailyAvg = daysLastMonth > 0 ? lastMonthTotal / daysLastMonth : 0;
-    const dailyChange = lastMonthDailyAvg > 0
-      ? ((dailyAvg - lastMonthDailyAvg) / lastMonthDailyAvg) * 100
-      : null;
-
-    return {
-      thisMonthTotal,
-      monthlyChange,
-      transactionCount: thisMonthExpenses.length,
-      avgPerTransaction,
-      dailyAvg,
-      dailyChange,
-      lastMonthTransactions: lastMonthExpenses.length,
-    };
+    return calculateSummaryStats(expenses);
   }, [expenses]);
 
   const transactionChange = stats.lastMonthTransactions > 0

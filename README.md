@@ -61,24 +61,40 @@ expense-tracker/
 
    Backend (`backend/.env`):
    ```env
-   DATABASE_URL="postgresql://username:password@localhost:5432/expense_tracker"
+   DATABASE_URL="postgresql://<render-user>:<render-password>@<render-internal-host>/<db-name>"
    JWT_SECRET="your-super-secret-jwt-key"
    JWT_EXPIRES_IN="7d"
    PORT=5000
-   FRONTEND_URL="http://localhost:3000"
+   NODE_ENV="production"
+   FRONTEND_URL="https://expense-tracker-frontend-pj0r.onrender.com"
    ```
 
    Frontend (`frontend/.env.local`):
    ```env
-   NEXT_PUBLIC_API_URL=http://localhost:5000/api
+   NEXT_PUBLIC_API_URL=https://expense-tracker-backend-nii9.onrender.com/api
    ```
 
-3. **Setup database**
+   If you deploy both backend and database on Render, use the database service's internal connection string in the backend `DATABASE_URL`. Use the external database URL only from outside Render, such as local development or one-off tooling.
+
+3. **Set Render environment variables**
+
+   Backend service:
+   - `DATABASE_URL` = Render internal database URL
+   - `JWT_SECRET` = a strong secret
+   - `JWT_EXPIRES_IN` = `7d` or your preferred value
+   - `PORT` = `5000`
+   - `NODE_ENV` = `production`
+   - `FRONTEND_URL` = `https://expense-tracker-frontend-pj0r.onrender.com`
+
+   Frontend service:
+   - `NEXT_PUBLIC_API_URL` = `https://expense-tracker-backend-nii9.onrender.com/api`
+
+4. **Setup database**
    ```bash
    pnpm db:push
    ```
 
-4. **Run development servers**
+5. **Run development servers**
    ```bash
    # Run both frontend and backend
    pnpm dev:all
