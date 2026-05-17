@@ -1,0 +1,70 @@
+version: '3.9'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: expense_tracker_db
+    environment:
+      POSTGRES_USER: yontenkinleytenzin
+      POSTGRES_PASSWORD: yonten8962
+      POSTGRES_DB: expense_tracker
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U yontenkinleytenzin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: expense_tracker_backend
+    ports:
+      - "5001:5001"
+    environment:
+      DATABASE_URL: postgresql://yontenkinleytenzin:yonten8962@postgres:5432/expense_tracker
+      JWT_SECRET: "your-super-secret-jwt-key-change-in-production-12345"
+      JWT_EXPIRES_IN: "7d"
+      PORT: 5001
+      NODE_ENV: development
+      FRONTEND_URL: http://localhost:3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend/src:/app/src
+    command: pnpm run dev
+    restart: unless-stopped
+
+  # Frontend Application
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: expense_tracker_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:5001/api
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    command: pnpm run dev
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  default:
+    name: expense_tracker_network
