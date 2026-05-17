@@ -3,6 +3,9 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+ARG DATABASE_URL=postgresql://placeholder:placeholder@localhost:5432/expense_tracker_ci
+ENV DATABASE_URL=$DATABASE_URL
+
 # Copy package files
 COPY package.json pnpm-lock.yaml ./
 
@@ -23,6 +26,9 @@ RUN pnpm run build
 FROM node:20-alpine
 
 WORKDIR /app
+
+ARG DATABASE_URL=postgresql://placeholder:placeholder@localhost:5432/expense_tracker_ci
+ENV DATABASE_URL=$DATABASE_URL
 
 # Install pnpm
 RUN npm install -g pnpm

@@ -38,6 +38,8 @@ jobs:
 
       - name: Generate Prisma client
         working-directory: ./backend
+        env:
+          DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/expense_tracker_ci
         run: pnpm db:generate
 
       - name: Run backend tests
