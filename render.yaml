@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: expense-tracker-backend
+    image:
+      registry: docker.io
+      repo: ${{ secrets.DOCKERHUB_USERNAME }}/expense-tracker-backend
+      tag: latest
+    envVars:
+      - key: PORT
+        value: "5000"
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: expense_tracker_db
+          property: connectionString
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: "7d"
+      - key: FRONTEND_URL
+        value: https://expense-tracker-frontend-pj0r.onrender.com
+    healthCheck:
+      path: /api/health
+      initialDelaySeconds: 10
+
+  - type: web
+    name: expense-tracker-frontend
+    image:
+      registry: docker.io
+      repo: ${{ secrets.DOCKERHUB_USERNAME }}/expense-tracker-frontend
+      tag: latest
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        value: https://expense-tracker-backend-nii9.onrender.com/api
+    healthCheck:
+      path: /
+      initialDelaySeconds: 10
+
+  - type: pserv
+    name: expense_tracker_db
+    ipAllowList: []
+    plan: free

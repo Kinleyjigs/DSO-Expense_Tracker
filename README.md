@@ -145,4 +145,73 @@ pnpm dev:all      # Run both
 pnpm build        # Build frontend
 pnpm db:push      # Push Prisma schema
 pnpm db:migrate   # Run migrations
+
+# Testing
+pnpm test              # Run all tests (backend + frontend)
+cd backend && pnpm test    # Backend tests only
+cd frontend && pnpm test   # Frontend tests only
 ```
+
+## CI/CD Pipeline
+
+This project uses **GitHub Actions** for automated testing, building Docker images, and deploying to Render.
+
+### Workflow: GitHub → DockerHub → Render
+
+1. **Push to `main` branch** on GitHub
+2. **GitHub Actions** automatically:
+   - Runs backend tests (`pnpm test` in backend/)
+   - Runs frontend tests (`pnpm test` in frontend/)
+   - If tests pass: builds Docker images for both backend and frontend
+   - Pushes images to DockerHub with tags `latest` and git SHA
+   - Triggers Render webhooks to deploy the new images
+3. **Render** pulls the Docker images from DockerHub and deploys them
+
+### Setup CI/CD
+
+#### 1. Create DockerHub Repository
+- Go to [DockerHub](https://hub.docker.com) and create two repositories:
+  - `<your-username>/expense-tracker-backend`
+  - `<your-username>/expense-tracker-frontend`
+
+#### 2. Generate DockerHub Access Token
+- In DockerHub: Account Settings → Security → New Access Token
+- Name it something like `github-ci` with read/write permissions
+- Copy the token (you won't see it again)
+
+#### 3. Add GitHub Secrets
+Go to GitHub repo → Settings → Secrets and Variables → Actions → New Repository Secret:
+- `DOCKERHUB_USERNAME`: Your DockerHub username
+- `DOCKERHUB_TOKEN`: The access token from step 2
+- `RENDER_BACKEND_WEBHOOK_URL`: Render deployment webhook for backend service
+- `RENDER_FRONTEND_WEBHOOK_URL`: Render deployment webhook for frontend service
+
+#### 4. Get Render Webhook URLs
+For each Render service (backend & frontend):
+- Go to Render dashboard → Service → Settings → Deployment Hooks
+- Create a webhook and copy the URL
+- Add to GitHub Secrets (see step 3)
+
+#### 5. Configure Render to Use Docker Images
+- In Render dashboard for each service:
+  - Change from "Connect to Git" to "Docker" image
+  - Set Image Repository: `docker.io/<your-username>/expense-tracker-backend` (or frontend)
+  - Set Image Tag: `latest`
+- Render will automatically pull new images when you push to GitHub
+
+#### 6. First Deploy
+- Push the code with the new workflow file to `main`:
+  ```bash
+  git add -A
+  git commit -m "Add GitHub Actions CI/CD workflow and render.yaml"
+  git push origin main
+  ```
+- Watch GitHub Actions: Go to repo → Actions tab to see the workflow run
+- If tests pass, images are built and pushed
+- Render webhooks trigger, pulling new images and deploying
+
+### Test Execution
+Tests run in the GitHub Actions workflow **before** building Docker images. If any test fails, the workflow stops and no images are pushed. This ensures only tested, working code reaches production.
+
+**Backend tests**: Unit tests, integration tests, API endpoint tests
+**Frontend tests**: UI component tests, end-to-end tests
