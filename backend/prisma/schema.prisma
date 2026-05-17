@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("postgresql://expense_tracker_db_rh3o_user:qO8wdBsuv0pfPq4mGGGn3d5dukdVDhUF@dpg-d84pi5pkh4rs73dbqv5g-a/expense_tracker_db_rh3o")
+  url      = env("DATABASE_URL")
 }
 
 model User {
