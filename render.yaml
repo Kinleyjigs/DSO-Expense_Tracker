@@ -19,7 +19,7 @@ services:
       - key: JWT_EXPIRES_IN
         value: "7d"
       - key: FRONTEND_URL
-        value: https://expense-tracker-frontend-ve21.onrender.com
+        value: https://expense-tracker-frontend-y621.onrender.com
     healthCheck:
       path: /api/health
       initialDelaySeconds: 10
@@ -32,7 +32,7 @@ services:
       tag: latest
     envVars:
       - key: NEXT_PUBLIC_API_URL
-        value: https://expense-tracker-backend-hwjx.onrender.com/api
+        value: https://expense-tracker-backend-nii9.onrender.com/api
     healthCheck:
       path: /
       initialDelaySeconds: 10
