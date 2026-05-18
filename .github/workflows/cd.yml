@@ -102,6 +102,7 @@ jobs:
         with:
           context: ./backend
           file: ./backend/Dockerfile
+          no-cache: true
           push: true
           tags: |
             ${{ env.BACKEND_IMAGE }}:latest
@@ -112,6 +113,7 @@ jobs:
         with:
           context: ./frontend
           file: ./frontend/Dockerfile
+          no-cache: true
           build-args: |
             NEXT_PUBLIC_API_URL=${{ env.NEXT_PUBLIC_API_URL }}
           push: true
