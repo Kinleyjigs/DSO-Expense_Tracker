@@ -8,8 +8,8 @@
     "start": "next start",
     "lint": "eslint .",
     "test": "pnpm test:ui && pnpm test:e2e",
-    "test:ui": "sh -c 'if ls test/ui/**/*.test.ts 1> /dev/null 2>&1; then tsx --test test/ui/**/*.test.ts; else echo "No UI tests found."; fi'",
-    "test:e2e": "tsx --test test/e2e/**/*.test.ts"
+    "test:ui": "sh -c 'if ls test/ui/**/*.test.ts 1> /dev/null 2>&1; then tsx --test test/ui/**/*.test.ts; else echo \"No UI tests found.\"; fi'",
+    "test:e2e": "sh -c 'if ls test/e2e/**/*.test.ts 1> /dev/null 2>&1; then tsx --test test/e2e/**/*.test.ts; else echo \"No e2e tests found.\"; fi'"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
