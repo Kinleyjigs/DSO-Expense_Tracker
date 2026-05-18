@@ -20,27 +20,28 @@ const allowedOrigins = [
   .map((origin) => origin.trim())
   .filter(Boolean);
 
+// CORS Configuration
+const corsOptions = {
+  origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+    // Allow requests with no origin (same-site requests)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.warn(`CORS blocked for origin: ${origin}`);
+      callback(new Error("CORS policy violation"));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  maxAge: 86400,
+};
+
 // Middleware
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (same-site requests)
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        console.warn(`CORS blocked for origin: ${origin}`);
-        callback(null, false);
-      }
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    maxAge: 86400,
-  })
-);
+app.use(cors(corsOptions));
 
 // Handle preflight requests explicitly
-app.options("*", cors());
+app.options("*", cors(corsOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
