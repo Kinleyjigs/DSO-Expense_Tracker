@@ -9,42 +9,55 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// List of allowed origins - be explicit
 const allowedOrigins = [
-  process.env.FRONTEND_URL,
   "https://expense-tracker-frontend-y621.onrender.com",
   "http://localhost:3000",
   "http://127.0.0.1:3000",
-]
-  .filter((origin): origin is string => typeof origin === "string")
-  .flatMap((origin) => origin.split(","))
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+];
 
-// CORS Configuration
+// If FRONTEND_URL env var is set, add it
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL);
+}
+
+console.log("[CORS] Allowed origins:", allowedOrigins);
+
+// Simple, bulletproof CORS configuration
 const corsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    // Allow requests with no origin (same-site requests)
-    if (!origin || allowedOrigins.includes(origin)) {
-      console.log(`CORS allowed for origin: ${origin}`);
-      callback(null, true);
-    } else {
-      console.warn(`CORS blocked for origin: ${origin}, allowed: ${allowedOrigins.join(", ")}`);
-      callback(null, false);
+    console.log(`[CORS] Request origin: ${origin}`);
+    
+    // Always allow if no origin (same-site requests, mobile apps, etc.)
+    if (!origin) {
+      console.log("[CORS] No origin header, allowing");
+      return callback(null, true);
     }
+    
+    // Check if origin is in allowed list
+    if (allowedOrigins.includes(origin)) {
+      console.log(`[CORS] Origin ${origin} is allowed`);
+      return callback(null, true);
+    }
+    
+    console.warn(`[CORS] Origin ${origin} is NOT allowed`);
+    return callback(null, false);
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  exposedHeaders: ["X-Total-Count"],
-  maxAge: 86400,
+  exposedHeaders: ["X-Total-Count", "Content-Type"],
+  maxAge: 3600,
 };
 
-// Middleware
+// Apply CORS to all routes
 app.use(cors(corsOptions));
 
-// Handle preflight requests explicitly
+// Explicitly handle OPTIONS requests for preflight
 app.options("*", cors(corsOptions));
 
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
