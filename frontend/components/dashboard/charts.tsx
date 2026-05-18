@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { useExpenseStore } from '@/lib/store';
+import { Badge } from '@/components/ui/badge';
 import { CATEGORIES } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -22,6 +23,7 @@ import {
   Line,
 } from 'recharts';
 import { format, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, eachMonthOfInterval, isWithinInterval } from 'date-fns';
+import { BarChart3, Sparkles } from 'lucide-react';
 
 const CHART_COLORS = [
   'var(--chart-1)',
@@ -35,6 +37,30 @@ const CHART_COLORS = [
   'var(--warning)',
   'var(--muted-foreground)',
 ];
+
+function EmptyChartState({ title, description }: { title: string; description: string }) {
+  return (
+    <Card className="bg-card/50 border-border/50">
+      <CardHeader>
+        <CardTitle className="text-lg font-semibold">{title}</CardTitle>
+        <p className="text-sm text-muted-foreground">{description}</p>
+      </CardHeader>
+      <CardContent>
+        <div className="flex min-h-[260px] flex-col items-center justify-center rounded-2xl border border-dashed border-border/70 bg-gradient-to-b from-secondary/30 to-background/40 px-6 text-center">
+          <Badge variant="secondary" className="mb-4 rounded-full px-3 py-1 text-xs">
+            <Sparkles className="mr-2 h-3.5 w-3.5" />
+            Waiting for data
+          </Badge>
+          <BarChart3 className="h-10 w-10 text-muted-foreground/70" />
+          <p className="mt-4 text-sm font-medium text-foreground">This section will populate once expenses arrive.</p>
+          <p className="mt-2 max-w-sm text-sm text-muted-foreground">
+            Add a few transactions and the chart will show the real trend instead of an empty canvas.
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 function CustomTooltip({ active, payload, label }: any) {
   if (active && payload && payload.length) {
@@ -54,6 +80,10 @@ function CustomTooltip({ active, payload, label }: any) {
 
 export function SpendingTrendChart() {
   const expenses = useExpenseStore((state) => state.expenses);
+
+  if (expenses.length === 0) {
+    return <EmptyChartState title="Spending Trend" description="Last 30 days" />;
+  }
 
   const data = useMemo(() => {
     const now = new Date();
@@ -126,6 +156,10 @@ export function SpendingTrendChart() {
 
 export function CategoryPieChart() {
   const expenses = useExpenseStore((state) => state.expenses);
+
+  if (expenses.length === 0) {
+    return <EmptyChartState title="By Category" description="This month" />;
+  }
 
   const data = useMemo(() => {
     const now = new Date();
@@ -209,6 +243,10 @@ export function CategoryPieChart() {
 export function MonthlyComparisonChart() {
   const expenses = useExpenseStore((state) => state.expenses);
 
+  if (expenses.length === 0) {
+    return <EmptyChartState title="Monthly Comparison" description="Last 6 months" />;
+  }
+
   const data = useMemo(() => {
     const now = new Date();
     const sixMonthsAgo = subMonths(now, 5);
@@ -274,6 +312,10 @@ export function MonthlyComparisonChart() {
 
 export function CategoryTrendChart() {
   const expenses = useExpenseStore((state) => state.expenses);
+
+  if (expenses.length === 0) {
+    return <EmptyChartState title="Category Trends" description="Top categories over 3 months" />;
+  }
 
   const data = useMemo(() => {
     const now = new Date();

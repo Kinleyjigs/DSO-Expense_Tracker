@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { useExpenseStore } from '@/lib/store';
 import { CATEGORIES } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import {
   UtensilsCrossed,
@@ -49,9 +50,15 @@ export function RecentExpenses() {
       <CardContent>
         <div className="space-y-4">
           {recentExpenses.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-8">
-              No expenses yet. Add your first expense!
-            </p>
+            <div className="flex min-h-[220px] flex-col items-center justify-center rounded-2xl border border-dashed border-border/70 bg-gradient-to-b from-secondary/30 to-background/40 px-6 text-center">
+              <Badge variant="secondary" className="mb-4 rounded-full px-3 py-1 text-xs">
+                No activity yet
+              </Badge>
+              <p className="text-sm font-medium text-foreground">Your latest transactions will show up here.</p>
+              <p className="mt-2 max-w-sm text-sm text-muted-foreground">
+                Add your first expense and this panel will turn into a quick scan of recent spend.
+              </p>
+            </div>
           ) : (
             recentExpenses.map((expense) => {
               const category = CATEGORIES.find((c) => c.id === expense.category);
