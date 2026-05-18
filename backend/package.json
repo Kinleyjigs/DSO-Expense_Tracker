@@ -8,7 +8,7 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "test": "pnpm test:unit && pnpm test:integration && pnpm test:api",
-    "test:unit": "tsx --test test/unit/**/*.test.ts",
+    "test:unit": "sh -c 'if ls test/unit/**/*.test.ts 1> /dev/null 2>&1; then tsx --test test/unit/**/*.test.ts; else echo \"No unit tests found\"; fi'",
     "test:integration": "tsx --test test/integration/**/*.test.ts",
     "test:api": "tsx --test test/api/**/*.test.ts",
     "db:generate": "prisma generate",

@@ -40,9 +40,6 @@ COPY --from=builder /app/.next ./.next
 # Copy environment file (actual .env should be provided at runtime)
 COPY .env.example .env.local
 
-# If a build-arg was provided, ensure .env.local has the correct NEXT_PUBLIC_API_URL
-RUN if [ -n "$NEXT_PUBLIC_API_URL" ]; then echo "NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL" > .env.local; fi
-
 # Expose port
 EXPOSE 3000
 
