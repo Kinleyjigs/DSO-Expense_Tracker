@@ -3,8 +3,9 @@ services:
     name: expense-tracker-backend
     image:
       registry: docker.io
-      repo: ${{ secrets.DOCKERHUB_USERNAME }}/expense-tracker-backend
+      repo: yonten1234567890/expense-tracker-backend
       tag: latest
+    preDeployCommand: pnpm exec prisma db push
     envVars:
       - key: PORT
         value: "5000"
@@ -19,7 +20,7 @@ services:
       - key: JWT_EXPIRES_IN
         value: "7d"
       - key: FRONTEND_URL
-        value: https://expense-tracker-frontend-pj0r.onrender.com
+        value: https://expense-tracker-frontend-y621.onrender.com
     healthCheck:
       path: /api/health
       initialDelaySeconds: 10
@@ -28,7 +29,7 @@ services:
     name: expense-tracker-frontend
     image:
       registry: docker.io
-      repo: ${{ secrets.DOCKERHUB_USERNAME }}/expense-tracker-frontend
+      repo: yonten1234567890/expense-tracker-frontend
       tag: latest
     envVars:
       - key: NEXT_PUBLIC_API_URL
@@ -37,7 +38,6 @@ services:
       path: /
       initialDelaySeconds: 10
 
-  - type: pserv
-    name: expense_tracker_db
-    ipAllowList: []
+databases:
+  - name: expense_tracker_db
     plan: free

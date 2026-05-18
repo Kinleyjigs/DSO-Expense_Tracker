@@ -30,20 +30,10 @@ WORKDIR /app
 ARG DATABASE_URL=postgresql://placeholder:placeholder@localhost:5432/expense_tracker_ci
 ENV DATABASE_URL=$DATABASE_URL
 
-# Install pnpm
-RUN npm install -g pnpm
-
-# Copy package files from builder
+# Copy the dependency tree from the builder stage so Prisma and app deps are
+# available without re-running generation in the runtime image.
 COPY --from=builder /app/package.json /app/pnpm-lock.yaml ./
-
-# Install dependencies for runtime and Prisma generation
-RUN pnpm install --frozen-lockfile
-
-# Copy Prisma schema before generating the client in this image
-COPY --from=builder /app/prisma ./prisma
-
-# Generate Prisma Client in the runtime image as well
-RUN pnpm exec prisma generate
+COPY --from=builder /app/node_modules ./node_modules
 
 # Copy built application and Prisma files
 COPY --from=builder /app/dist ./dist
@@ -58,5 +48,5 @@ EXPOSE 5000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://localhost:5000/api/health', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
 
-# Start the application. Ensure Prisma schema is applied at start (idempotent).
-CMD ["sh", "-c", "pnpm exec prisma db push && node dist/server.js"]
+# Start the application.
+CMD ["node", "dist/server.js"]

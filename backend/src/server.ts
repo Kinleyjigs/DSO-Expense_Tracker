@@ -9,13 +9,24 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  process.env.FRONTEND_URLS,
+  "https://expense-tracker-frontend-pj0r.onrender.com",
+  "https://expense-tracker-frontend-y621.onrender.com",
+  "https://expense-tracker-frontend-ve21.onrender.com",
+  "localhost:3000",
+  "127.0.0.1:3000",
+]
+  .filter((origin): origin is string => typeof origin === "string")
+  .flatMap((origin) => origin.split(","))
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
 // Middleware
 app.use(
   cors({
-    origin:
-      process.env.FRONTEND_URL ||
-      "https://expense-tracker-frontend-pj0r.onrender.com",
+    origin: allowedOrigins.length > 0 ? allowedOrigins : true,
     credentials: true,
   })
 );

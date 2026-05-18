@@ -22,6 +22,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    platform: linux/amd64
     container_name: expense_tracker_backend
     ports:
       - "5000:5000"
@@ -45,6 +46,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    platform: linux/amd64
     container_name: expense_tracker_frontend
     ports:
       - "3000:3000"
